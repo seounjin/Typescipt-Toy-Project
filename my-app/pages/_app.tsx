@@ -1,17 +1,10 @@
-import { AppProps } from 'next/app'
-import MsgList from '../components/MsgList'
+import './index.scss'
 
-// function App({ Component, pageProps }: AppProps) {
-//   return <Component {...pageProps} />
-// }
+const App = ({ Component, pageProps }) => <Component {...pageProps} />
 
-// export default App
+App.getInitialProps = async ({ ctx, Component }) => {
+  const pageProps = await Component.getInitialProps?.(ctx)
+  return { pageProps }
+}
 
-const Home = ():JSX.Element => (
-    <>
-        <h1>하이</h1>
-        <MsgList/>
-    </>
-)
-
-export default Home
+export default App

@@ -7,6 +7,7 @@ interface MsgItemProps {
     text:string,
     onUpdate: (text: string, id:number) => void,
     startEdit: () => void,
+    onDelete: () => void,
     isEditing: any
 }
 
@@ -18,9 +19,10 @@ const MsgItem = ({
     onUpdate,
     isEditing, 
     startEdit,
+    onDelete,
 
 }: MsgItemProps): JSX.Element => (
-    <li className="messages__items">
+    <li className="messages__item">
         <h3>
         {userId}{' '}
         <sub>
@@ -44,6 +46,7 @@ const MsgItem = ({
 
     <div className="messages__buttons">
         <button onClick={startEdit}>수정</button>
+        <button onClick={onDelete}>삭제</button>
     </div>
 
 
