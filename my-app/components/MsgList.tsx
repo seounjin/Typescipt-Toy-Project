@@ -1,52 +1,60 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import MsgItem from './MsgItem'
 import MsgInput from './MsgInput'
-
+import fetcher from '../fetcher'
+import { useRouter } from 'next/router'
 
 interface Messages {
-    id:number,
-    userId:string,
-    timestamp:number,
-    text:string
+    id: string,
+    userId: string,
+    timestamp: number,
+    text: string
+}
+
+enum METHOD {
+    GET = 'get',
+    POST = 'post',
+    PUT = 'put',
+    DELETE = 'delete'
 }
 
 type mutateType = (text: string) => void 
-type upDateType = (text: string, id:number) => void 
-type deleteType = (id:number) => void
+type upDateType = (text: string, id: string) => void 
+type deleteType = (id: string) => void
 
-
-const UserIds: string[] = ['ray', 'jay']
-
-const getRandomUserId = ():string => UserIds[Math.round(Math.random())]
-
-const originalMsgs = Array(10).fill(0).map((_, index: number): Messages => ({
-    id: index + 1,
-    userId: getRandomUserId(),
-    timestamp:1234567890123 + index * 1000 * 60,
-    text: `${index + 1} mock text`
-})) 
 
 const MsgList = ():JSX.Element => {
 
-    const [msgs, setMsgs] = useState(originalMsgs)
+    const [msgs, setMsgs] = useState<Messages[]>(null)
     const [editingId, setEditingId] = useState(null)
+    const { query } = useRouter()
+    const userId = (query.userId || query.userid || '') as string
 
-    const onCreate:mutateType = (text:string): void => {
+    const getMessages = async():Promise<void> => {
+        const msgs:Messages[] = await fetcher(METHOD.GET, '/messages')
+        console.log("msgs", msgs)
+        setMsgs(msgs)
+    }
 
-        const newMsg: Messages = {
-          id: msgs.length + 1,
-          userId: getRandomUserId(),
-          timestamp: Date.now(),
-          text: `${msgs.length + 1} ${text}`,
-        }
+    useEffect(()=> {
+        getMessages()
+    },[])
 
-        setMsgs(msgs => [newMsg, ...msgs])
+    const onCreate:mutateType = async(text:string): Promise<void> => {
+
+        const newMsg: Messages[] = await fetcher(METHOD.PUT, `/messages/${userId}`, { text, userId })
+
+
+        setMsgs(msgs => [...newMsg, ...msgs])
     }
 
     const doneEdit = ():void => setEditingId(null)
 
-    const onUpdate: upDateType = (text, id):void => {
+    const onUpdate: upDateType = async(text, id): Promise<void> => {
 
+        const newMsg: Messages[] = await fetcher(METHOD.PUT, `/messages/${id}`, { text, userId })
+        if (!newMsg) throw Error('something wrong')
+    
         setMsgs(msgs => {
           const targetIndex = msgs.findIndex(msg => msg.id === id)
           if (targetIndex < 0) return msgs
@@ -60,19 +68,21 @@ const MsgList = ():JSX.Element => {
         doneEdit()
     }
 
-    const onDelete:deleteType = (id:number):void => {
+    const onDelete: deleteType = async(id: string) => {
+        const receivedId: string = await fetcher(METHOD.DELETE, `/messages/${id}`, { params: { userId } })
         setMsgs(msgs => {
-          const targetIndex = msgs.findIndex(msg => msg.id === id)
+          const targetIndex = msgs.findIndex(msg => msg.id === receivedId + '')
           if (targetIndex < 0) return msgs
           const newMsgs = [...msgs]
           newMsgs.splice(targetIndex, 1)
           return newMsgs
         })
-    }
+      }
 
     return (
         <>
             <MsgInput mutate={onCreate}/>
+            {msgs && 
             <ul className="messages">{
                 msgs.map((x:Messages) => 
                     <MsgItem key={x.id} 
@@ -81,8 +91,13 @@ const MsgList = ():JSX.Element => {
                         startEdit={():void => setEditingId(x.id)}
                         isEditing={editingId === x.id}
                         onDelete={():void => onDelete(x.id)}
-                    />)
-            }</ul>
+                        myId={userId} />
+                        )}
+            
+            </ul>
+            
+            }
+            
         </>
     )
 }

@@ -2,9 +2,9 @@ import React from 'react'
 import { useRef } from 'react'
 
 type MsgInputProps = {
-    mutate: (text: string, id?:number) => void
+    mutate: (text: string, id?:string) => void
     text?: string
-    id?: number
+    id?: string
 }
 
   

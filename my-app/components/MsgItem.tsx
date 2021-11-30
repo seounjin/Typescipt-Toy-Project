@@ -1,14 +1,15 @@
 import MsgInput from './MsgInput'
 
 interface MsgItemProps {
-    id:number,
+    id:string,
     userId:string,
     timestamp:number,
     text:string,
-    onUpdate: (text: string, id:number) => void,
+    onUpdate: (text: string, id:string) => void,
     startEdit: () => void,
     onDelete: () => void,
-    isEditing: any
+    isEditing: any,
+    myId:string
 }
 
 const MsgItem = ({
@@ -20,7 +21,7 @@ const MsgItem = ({
     isEditing, 
     startEdit,
     onDelete,
-
+    myId,
 }: MsgItemProps): JSX.Element => (
     <li className="messages__item">
         <h3>
@@ -44,10 +45,12 @@ const MsgItem = ({
         text
         )}
 
-    <div className="messages__buttons">
-        <button onClick={startEdit}>수정</button>
-        <button onClick={onDelete}>삭제</button>
-    </div>
+        {myId === userId && (
+        <div className="messages__buttons">
+            <button onClick={startEdit}>수정</button>
+            <button onClick={onDelete}>삭제</button>
+        </div>
+        )}
 
 
     </li>
