@@ -4,6 +4,17 @@ import MsgInput from './MsgInput'
 import fetcher from '../fetcher'
 import { useRouter } from 'next/router'
 
+
+interface User {
+    id: string
+    nickname: string
+}
+  
+interface Users {
+    [key: string]: User
+}
+
+
 interface Messages {
     id: string,
     userId: string,
@@ -23,9 +34,9 @@ type upDateType = (text: string, id: string) => void
 type deleteType = (id: string) => void
 
 
-const MsgList = ():JSX.Element => {
+const MsgList = ({ smsgs, users }:{smsgs:Messages[]; users:Users}):JSX.Element => {
 
-    const [msgs, setMsgs] = useState<Messages[]>(null)
+    const [msgs, setMsgs] = useState<Messages[]>(smsgs)
     const [editingId, setEditingId] = useState(null)
     const { query } = useRouter()
     const userId = (query.userId || query.userid || '') as string
@@ -82,7 +93,6 @@ const MsgList = ():JSX.Element => {
     return (
         <>
             <MsgInput mutate={onCreate}/>
-            {msgs && 
             <ul className="messages">{
                 msgs.map((x:Messages) => 
                     <MsgItem key={x.id} 
@@ -96,7 +106,6 @@ const MsgList = ():JSX.Element => {
             
             </ul>
             
-            }
             
         </>
     )
