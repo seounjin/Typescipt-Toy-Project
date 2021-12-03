@@ -159,7 +159,7 @@ Data Fetching을 서버에서 하게 되면 속도가 빨라진다.
 
 **getInitialProps**
 
-****getInitialProps 내부 로직은 서버에서 실행된다. 따라서 Client에서만 가능한 로직은 피해야 한다. (Window, document 등)
+getInitialProps 내부 로직은 서버에서 실행된다. 따라서 Client에서만 가능한 로직은 피해야 한다. (Window, document 등)
 한 페이지를 로드할 때, 하나의 getInitialProps 로직만 실행된다. 예를 들어 _app.js에 getInitialProps를 달아서 사용한다면 그 하부 페이지의 getInitialProps는 실행되지 않는다.
 
 getInitialProps는 각 페이지에 static method로 구현된다.
@@ -179,7 +179,7 @@ export default App
 
 **getStaticProps**
 
-****"빌드 시에 딱 한 번"만 호출되고, 바로 static file로 빌드된다.
+"빌드 시에 딱 한 번"만 호출되고, 바로 static file로 빌드된다.
 
 따라서, 이후 수정이 불가능합니다.
 
